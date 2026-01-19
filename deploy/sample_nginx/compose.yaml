@@ -1,0 +1,10 @@
+services:
+    nginx:
+        restart: unless-stopped
+        container_name: sample-nginx
+        ports:
+            - 8111:80
+        labels:
+            - tsdproxy.enable=true
+            - tsdproxy.ephemeral=false
+        image: nginx:latest

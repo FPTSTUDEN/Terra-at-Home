@@ -1,0 +1,21 @@
+---
+services:
+  obsidian:
+    image: lscr.io/linuxserver/obsidian:latest
+    container_name: obsidian
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - obsidian_data:/config
+    ports:
+      - 3003:3000
+      - 3004:3001
+    shm_size: "1gb"
+    restart: unless-stopped
+    labels:
+      - tsdproxy.enable=true
+      - tsdproxy.ephemeral=false
+volumes:
+  obsidian_data:
