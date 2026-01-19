@@ -3,7 +3,7 @@ services:
         restart: unless-stopped
         container_name: sample-nginx
         ports:
-            - 8111:80
+            - 8111:80 # Nginx web interface (port 8111 on host maps to port 80 in container)
         labels:
             - tsdproxy.enable=true
             - tsdproxy.ephemeral=false
