@@ -11,7 +11,7 @@ The Mother repository for my server's deployments and self-hosted apps
 - printf "YOUR_CLIENT_ID" | docker secret create tsclientId -
 #### Deployment
 ##### Normal update
-- docker service update --force tsdproxy_tsdproxy
+- docker service update --force -d tsdproxy_tsdproxy
 ##### Cleanup & Restart
 - docker volume rm tsdproxy_datadir
 - docker stack rm tsdproxy
