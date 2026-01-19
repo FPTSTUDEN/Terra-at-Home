@@ -12,7 +12,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - datadir:/data
-      - ../config:/config:ro
+      - ./config:/config:ro # Read-only configuration files
     restart: unless-stopped
     ports:
       - "8080:8080"
