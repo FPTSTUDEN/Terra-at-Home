@@ -9,19 +9,31 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     volumes:
       - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nextcloud:
     image: nextcloud:29
     restart: unless-stopped
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - 8121:80 # Nextcloud web interface (port 8121 on host maps to port 80 in container)
     environment:
@@ -36,5 +48,22 @@ services:
     volumes:
       - ./data/nextcloud:/var/www/html
     labels:
-            - tsdproxy.enable=true
-            - tsdproxy.ephemeral=false
+      - tsdproxy.enable=true
+      - tsdproxy.ephemeral=false
+  nextcloud-cron:
+    image: nextcloud:29
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    entrypoint: /cron.sh
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_HOST: redis
+    volumes:
+      - ./data/nextcloud:/var/www/html
