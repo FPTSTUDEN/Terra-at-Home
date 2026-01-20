@@ -9,13 +9,14 @@ check_sensitivity() {
     echo "Checking file: $file"
     # Example patterns to check for (can be expanded)
     local patterns=(
-        "password="
-        "api_key=" 
-        "secret="
-        "token="
+        "password"
+        "api_key"
+        "secret"
+        "token"
+        "private_key"
     )
     for pattern in "${patterns[@]}"; do
-        if grep -q "$pattern" "$file"; then
+        if grep -qi "\b${pattern}\b" "$file"; then
             echo "Sensitive information found in $file: $pattern"
         fi
     done
