@@ -9,13 +9,17 @@ services:
       # Tell TSDProxy where to find the secrets (/run/secrets/)
       - TSDCLIENT_ID_FILE=/run/secrets/tsclientId
       - TSDCLIENT_SECRET_FILE=/run/secrets/tsclientSecret
+      - TS_CLIENT_ID: ${tsclientId}
+      - TS_CLIENT_SECRET: ${tsclientSecret}
     deploy:
       replicas: 1
     command: >
-      bash -c "export TSDCLIENT_ID=$(cat /run/secrets/tsclientId) &&
+      bash -c "echo $TSDCLIENT_ID &&
+      cat TSDCLIENT_ID_FILE &&
+      export TSDCLIENT_ID=$(cat /run/secrets/tsclientId) &&
       export TSDCLIENT_SECRET=$(cat /run/secrets/tsclientSecret) &&
-      echo $$TSDCLIENT_ID &&
-      echo $$TSDCLIENT_SECRET"
+      echo $TSDCLIENT_ID &&
+      echo $TSDCLIENT_SECRET"
 secrets:
   tsclientId:
     external: true
