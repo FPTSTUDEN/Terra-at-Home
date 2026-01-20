@@ -20,6 +20,20 @@ services:
       - "host.docker.internal:host-gateway"
     deploy:
       replicas: 1
+    # Debugging command to verify secrets are mounted correctly
+    command: >
+      sh -c "
+        echo 'Client ID file exists:' && 
+        ls -la /run/secrets/tsclientId && 
+        echo 'Content:' && 
+        cat /run/secrets/tsclientId && 
+        echo '---' && 
+        echo 'Client Secret file exists:' && 
+        ls -la /run/secrets/tsclientSecret && 
+        echo 'Content length:' && 
+        cat /run/secrets/tsclientSecret | wc -c &&
+        /app/tsdproxy
+      "
 volumes:
   datadir:
 secrets:
