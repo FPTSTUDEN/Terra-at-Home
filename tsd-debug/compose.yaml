@@ -11,7 +11,10 @@ services:
       - TSDCLIENT_SECRET_FILE=/run/secrets/tsclientSecret
     deploy:
       replicas: 1
-    command: bash -c "export TSDCLIENT_ID=\$(cat /run/secrets/tsclientId) && export TSDCLIENT_SECRET=\$(cat /run/secrets/tsclientSecret) && cat \${TSDCLIENT_ID} \${TSDCLIENT_SECRET}"
+    command: > 
+      bash -c "cat /run/secrets/tsclientId > TSDCLIENT_ID
+      && cat /run/secrets/tsclientSecret > TSDCLIENT_SECRET
+      && cat \${TSDCLIENT_ID} \${TSDCLIENT_SECRET}"
 secrets:
   tsclientId:
     external: true
