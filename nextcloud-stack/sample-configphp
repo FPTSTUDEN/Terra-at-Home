@@ -1,0 +1,16 @@
+# nextcloud-stack/data/nextcloud/config/config.php
+$CONFIG = array (
+    ...
+    array (
+        0 => 'localhost',
+        1 => 'nextcloud',
+        2 => '100.0.0.0/8',
+        3 => '172.23.0.1',
+        4 => 'nextcloud.localhost',
+        5 => '100.123.14.121',
+        6 => '100.121.183.76',
+        7 => '100.116.1.22',
+        8 => '100.111.213.30',
+    ),
+
+...);
