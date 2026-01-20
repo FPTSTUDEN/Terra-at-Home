@@ -1,0 +1,12 @@
+services:
+    nginx:
+        restart: unless-stopped
+        container_name: tester-nginx
+        ports:
+            - 8151:80 # Nginx web interface (port 8151 on host maps to port 80 in container)
+        labels:
+            - tsdproxy.enable=true
+            - tsdproxy.ephemeral=false
+        image: nginx:latest
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro

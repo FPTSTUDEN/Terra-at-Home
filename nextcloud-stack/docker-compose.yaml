@@ -35,7 +35,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - 8121:80 # Nextcloud web interface (port 8121 on host maps to port 80 in container)
+      - 0.0.0.0:8121:80 # Nextcloud web interface (port 8121 on host maps to port 80 in container)
     environment:
       POSTGRES_HOST: db
       POSTGRES_DB: ${POSTGRES_DB}
@@ -45,6 +45,9 @@ services:
       NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
       NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
       NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_TRUSTED_DOMAINS}
+
+      APACHE_SERVER_NAME: Nextcloud.localhost
+      APACHE_SERVER_ALIAS: localhost ${TS_IP} 
     volumes:
       - ./data/nextcloud:/var/www/html
     labels:
