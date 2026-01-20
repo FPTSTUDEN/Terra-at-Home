@@ -6,12 +6,12 @@ services:
       - tsclientId
       - tsclientSecret
     environment:
-      # Tell TSDProxy where to find the secrets (mounted by Docker)
+      # Tell TSDProxy where to find the secrets (/run/secrets/)
       - TSDCLIENT_ID_FILE=/run/secrets/tsclientId
       - TSDCLIENT_SECRET_FILE=/run/secrets/tsclientSecret
     deploy:
       replicas: 1
-    command: cat ${TSDCLIENT_ID_FILE} ${TSDCLIENT_SECRET_FILE} && sleep infinity
+    command: bash -c "export TSDCLIENT_ID=\$(cat /run/secrets/tsclientId) && export TSDCLIENT_SECRET=\$(cat /run/secrets/tsclientSecret) && cat \${TSDCLIENT_ID} \${TSDCLIENT_SECRET}"
 secrets:
   tsclientId:
     external: true
