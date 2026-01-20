@@ -9,6 +9,8 @@ The Mother repository for my server's deployments and self-hosted apps
 #### Secret management
 - docker secret rm tsclientSecret
 - printf "YOUR_CLIENT_ID" | docker secret create tsclientId -
+
+- docker service create --name temp-alpine --secret tsclientSecret alpine:latest cat /run/secrets/tsclientSecret
 #### Deployment
 ##### Normal update
 - docker service update --force -d tsdproxy_tsdproxy
