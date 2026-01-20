@@ -16,7 +16,7 @@ check_sensitivity() {
         "private_key"
     )
     for pattern in "${patterns[@]}"; do
-        if grep -qi "\b${pattern}\b" "$file"; then
+        if grep -qi "${pattern}" "$file"; then
             echo "Sensitive information found in $file: $pattern"
         fi
     done
