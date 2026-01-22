@@ -1,3 +1,7 @@
+#curl https://machinename.tailnet.ts.net:8151
+# or
+#curl http://tsdproxy-mapper.tailnet.ts.net 
+# to access nginx web interface
 services:
     nginx:
         restart: unless-stopped

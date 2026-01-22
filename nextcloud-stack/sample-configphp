@@ -1,4 +1,5 @@
 # nextcloud-stack/data/nextcloud/config/config.php
+# nano ./data/nextcloud/config/config.php
 $CONFIG = array (
     ...
     array (
