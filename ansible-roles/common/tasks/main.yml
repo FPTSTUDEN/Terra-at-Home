@@ -1,0 +1,41 @@
+---
+# tasks file for common
+- name: System maintenance and Software Updates
+  hosts: all
+  become: yes
+  tasks:
+    - name: Debian tasks
+      block:
+        - name: Update apt cache and upgrade packages
+          apt:
+            update_cache: true
+            upgrade: dist
+        - name: Ensure SSH service is running
+          service:
+            name: ssh
+            state: started
+            enabled: true
+      when: ansible_os_family == "Debian"
+
+    - name: RedHat tasks
+      block:
+        - name: Update yum cache and upgrade packages
+          yum:
+            name: '*'
+            state: latest
+        - name: Ensure SSH service is running
+          service:
+            name: sshd
+            state: started
+            enabled: true
+      when: ansible_os_family == "RedHat"
+    - name: Install common packages
+      package:
+        name:
+          - vim
+          - git
+          - curl
+          - wget
+          - python3
+          - openssh-server
+        state: present
