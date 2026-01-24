@@ -1,9 +1,8 @@
 ---
 # tasks file for common
 - name: System maintenance and Software Updates
-  hosts: all
   become: yes
-  tasks:
+  block:
     - name: Debian tasks
       block:
         - name: Update apt cache and upgrade packages
@@ -29,6 +28,7 @@
             state: started
             enabled: true
       when: ansible_os_family == "RedHat"
+    
     - name: Install common packages
       package:
         name:
