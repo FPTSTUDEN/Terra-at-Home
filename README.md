@@ -3,15 +3,15 @@
 ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
 
 # Terra at Home
-> <img align="right" alt="earth-chan" src=".misc\earth-chan-with-watering-can-v0-f0616jur8mab1.webp" width=15% height=15%>
+> <img align="right" alt="earth-chan" src=".misc\earth-chan-with-watering-can-v0-f0616jur8mab1.webp" width=25% height=25%>
 <!-- <div> -->
-<p>The resemblance of my entire server's **configuration, deployments and app stack** in one centralised repository
-</p>
+The resemblance of my entire server's **configuration, deployments and app stack** in one centralised repository
 
 > "Terra", or Earth, is the third planet of the Solar System, the only one known so far to harbor life. 
 <!-- </div> -->
 
-## Tech Stack
+**Featuring...**
+
 ![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
@@ -28,7 +28,7 @@
 - Fully automated app stack setup with Ansible
 - IaC with Terraform (need a provider somehow) 
 
-## Features
+## Features list
 
 ### Secured networking
 
@@ -45,13 +45,12 @@
 
 #### Secret-checker scripts
 
-- **Sensitivity Finder Script** - sensfind.sh
-  - finds and lists seemlingly sensitive files (.env, .key, .pem, .crt).
-  - ./sensfind.sh directory-name
-  - pipe-able to senscheck.sh
-- **Sensitivity Check Script** - senscheck.sh
+- **Sensitivity Finder**
+  - ```./sensfind.sh directory-name```
+  - finds and lists seemlingly sensitive files (.env, .key, .crt...), pipe-able to ```senscheck.sh```
+- **Sensitivity Check**
+  - ```./senscheck.sh file1 file2 ...```
   - Scans for common sensitive data patterns and file permissions
-  - ./senscheck.sh file1 file2 ...
 
 ## Reminders
 
