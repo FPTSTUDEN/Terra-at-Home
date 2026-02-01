@@ -1,0 +1,4 @@
+*.yaml linguist-detectable=true
+*.yml linguist-detectable=true
+*.yaml linguist-language=Dockerfile
+*.yml linguist-language=Ansible
