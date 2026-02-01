@@ -3,13 +3,17 @@
 ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
 
 # Terra at Home
-
-The resemblance of my entire server's **configuration, deployments and app stack** in one centralised repository.
-
 > <img align="right" alt="earth-chan" src=".misc\earth-chan-with-watering-can-v0-f0616jur8mab1.webp" width=15% height=15%>
+<!-- <div> -->
+<p>The resemblance of my entire server's **configuration, deployments and app stack** in one centralised repository
+</p>
+
+> "Terra", or Earth, is the third planet of the Solar System, the only one known so far to harbor life. 
+<!-- </div> -->
 
 ## Tech Stack
 ![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Wireguard](https://img.shields.io/badge/wireguard-%2388171A.svg?style=for-the-badge&logo=wireguard&logoColor=white)
 ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
