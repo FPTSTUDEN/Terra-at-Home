@@ -1,13 +1,18 @@
-![GitHub Copilot](https://img.shields.io/badge/github_copilot-8957E5?style=for-the-badge&logo=github-copilot&logoColor=white)
+<img alt="pixel cover" src=".misc/Pixel_ (21).jpg" width=80% height=80%>
+
+<!-- ![GitHub Copilot](https://img.shields.io/badge/github_copilot-8957E5?style=for-the-badge&logo=github-copilot&logoColor=white)
 ![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
-![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
+![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white) -->
 
 # Terra at Home
+
 > <img align="right" alt="earth-chan" src=".misc\earth-chan-with-watering-can-v0-f0616jur8mab1.webp" width=25% height=25%>
 <!-- <div> -->
 The resemblance of my entire server's **configuration, deployments and app stack** in one centralised repository
 
-> "Terra", or Earth, is the third planet of the Solar System, the only one known so far to harbor life. 
+> "**Terra**", or **Earth**, is the Third planet of the Solar System, the only one known so far to **harbor life**.
+
+Similarly, "**Terra at Home**" shall be the place that **brings life** to my server and my programming journey.
 <!-- </div> -->
 
 **Featuring...**
@@ -55,6 +60,7 @@ The resemblance of my entire server's **configuration, deployments and app stack
 ## Reminders
 
 ### Ignoring perm changes on windows
+
 ```
 git config core.filemode false
 ```
@@ -90,6 +96,10 @@ docker compose logs -f --tail 100
 - docker stack deploy -c compose.yaml tsdproxy
 ```
 
+## Image Credits
+
+- [Cute Earth-chan illustration by k030](https://www.deviantart.com/k030/art/Earth-Chan-731945867)
+- [Beautiful pixel art wallpaper by Norma2D](https://norma-2d.itch.io/pixel-art-wallpaper)
 
 
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
