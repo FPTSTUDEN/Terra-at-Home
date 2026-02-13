@@ -1,0 +1,12 @@
+#cloud-config
+version: 2
+ethernets:
+  eth0:
+    dhcp4: no                # Disable DHCP for IPv4
+    addresses:
+      - 192.168.1.50/24      # Static IP address with CIDR
+    gateway4: 192.168.1.1    # Default gateway
+    nameservers:
+      addresses:
+        - 8.8.8.8
+        - 8.8.4.4
