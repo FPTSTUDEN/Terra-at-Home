@@ -13,11 +13,12 @@ resource "multipass_instance" "web_server" {
   
   # This is the "Enterprise Secret Sauce"
   cloud_init = <<-EOT
-    #cloud-config
-    packages:
-      - docker.io
-    runcmd:
-      - systemctl enable --now docker
-      - usermod -aG docker ubuntu
+#cloud-config
+package_update: true
+package_upgrade: true
   EOT
+
+  lifecycle {
+    ignore_changes = [cpus, memory, cloud_init]
+  }
 }

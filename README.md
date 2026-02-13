@@ -1,4 +1,4 @@
-<img alt="pixel cover" src=".misc/Pixel_ (21).jpg" width=80% height=80%>
+<img alt="pixel cover" src=".misc/Pixel_ (21).jpg" width=100%>
 
 <!-- ![GitHub Copilot](https://img.shields.io/badge/github_copilot-8957E5?style=for-the-badge&logo=github-copilot&logoColor=white)
 ![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
