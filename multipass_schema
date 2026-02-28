@@ -1,0 +1,14 @@
+  + resource "multipass_instance" "web_server" {
+      + cloud_init     = (sensitive value)
+      + cpus           = 2
+      + id             = (known after apply)
+      + image          = "noble"
+      + image_release  = (known after apply)
+      + ipv4           = (known after apply)
+      + last_updated   = (known after apply)
+      + memory         = "2G"
+      + name           = "prod-sim-01"
+      + release        = (known after apply)
+      + snapshot_count = (known after apply)
+      + state          = (known after apply)
+    }

@@ -35,6 +35,6 @@ resource "multipass_instance" "web_server" {
   #   delete = "5m"
   # }
 }
-# output "instance_ip" {
-#   value = multipass_instance.web_server.network_interfaces[0].address
-# }
+output "instance_ip" {
+  value = multipass_instance.web_server.ipv4[0]
+}
