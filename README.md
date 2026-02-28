@@ -29,9 +29,10 @@ Similarly, "**Terra at Home**" shall be the place that **brings life** to my ser
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 ## TO-DO
+
 - Formatting this file to look cooler...
 - Fully automated app stack setup with Ansible
-- IaC with Terraform (need a provider somehow) 
+- IaC with Multipass
 
 ## Features list
 
@@ -57,44 +58,9 @@ Similarly, "**Terra at Home**" shall be the place that **brings life** to my ser
   - ```./senscheck.sh file1 file2 ...```
   - Scans for common sensitive data patterns and file permissions
 
-## Reminders
+## Commands guide
 
-### Ignoring perm changes on windows
-
-```
-git config core.filemode false
-```
-
-### Docker secrets
-
-```bash
-docker secret rm tsclientSecret
-printf "YOUR_CLIENT_ID" | docker secret create tsclientId -
-
-docker service create --name temp-alpine --secret tsclientSecret alpine:latest cat /run/secrets/tsclientSecret
-```
-
-### Core proxy: TSDProxy
-
-#### Debugging
-
-```bash
-docker compose logs -f --tail 100
-```
-
-#### Normal update
-
-```bash
-- docker service update --force -d tsdproxy_tsdproxy
-```
-
-#### Cleanup & Restart
-
-```bash
-- docker volume rm tsdproxy_datadir
-- docker stack rm tsdproxy
-- docker stack deploy -c compose.yaml tsdproxy
-```
+Refer to [commands.md](./commands.md)
 
 ## Image Credits
 
