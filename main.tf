@@ -35,6 +35,18 @@ resource "multipass_instance" "web_server" {
   #   delete = "5m"
   # }
 }
+resource "local_file" "ssh_config" {
+  filename        = "${path.module}/ssh_config"
+  file_permission = "0600"
+  content         = <<-EOT
+    Host prod-sim
+      HostName ${multipass_instance.web_server.ipv4[0]}
+      User ubuntu
+      IdentityFile ~/.ssh/id_multipass
+      StrictHostKeyChecking no
+  EOT
+}
+
 output "instance_ip" {
   value = multipass_instance.web_server.ipv4[0]
 }

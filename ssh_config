@@ -1,0 +1,5 @@
+Host prod-sim
+  HostName 172.23.127.244
+  User ubuntu
+  IdentityFile ~/.ssh/id_multipass
+  StrictHostKeyChecking no
