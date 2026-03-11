@@ -30,9 +30,10 @@ Similarly, "**Terra at Home**" shall be the place that **brings life** to my ser
 
 ## TO-DO
 
-- Formatting this file to look cooler...
-- Fully automated app stack setup with Ansible
-- IaC with Multipass
+- [x] IaC with Multipass
+- [ ] Figure out local Ansible approach (wsl/container/...)
+- [ ] Fully automated app stack setup
+- [ ] Formatting this file to look cooler...
 
 ## Features list
 
