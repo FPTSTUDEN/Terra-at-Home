@@ -1,12 +1,39 @@
 # Commands
 
-## Multipass quick check
+## Multipass
+
+### Troubleshooting
 
 ``` bash
 multipass launch -n my-test-vm --cloud-init cloud-config.yaml
 multipass shell my-test-vm
 multipass info my-test-vm
 multipass delete my-test-vm
+```
+
+### Network setup
+
+```pwsh
+New-VMSwitch -Name "DevOps-Internal" -SwitchType Internal
+New-NetIPAddress -IPAddress 192.168.100.1 -PrefixLength 24 -InterfaceAlias "vEthernet (DevOps-Internal)"
+```
+
+```bash
+multipass networks
+# multipass list # also shows internal IPs
+multipass info prod-sim-01
+# multipass doesn't always automatically assign an IP to an Internal Switch (because there is no DHCP server on that virtual cable)
+sudo ip addr add 192.168.1.100/24 dev eth1 # on WLAN
+sudo ip addr add 192.168.100.10/24 dev eth1 # on DevOps-Internal
+```
+
+### Connectivity
+
+```bash
+# Forgor the old identity first
+ssh-keygen -f '~/.ssh/known_hosts' -R '192.168.100.10'
+#  Then ssh
+ssh -i ~/.ssh/id_multipass ubuntu@192.168.100.10
 ```
 
 ## Ignoring perm changes on windows

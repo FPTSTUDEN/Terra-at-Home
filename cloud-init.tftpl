@@ -10,3 +10,18 @@ package_update: true
 packages:
   - docker.io
   - git
+write_files:
+  - path: /etc/netplan/50-cloud-init.yaml
+    content: |
+      network:
+        version: 2
+        ethernets:
+          eth1:
+            addresses:
+              - 192.168.100.10/24
+              # gateway4:
+              # - 192.168.100.1
+# This forces the VM to have a static IP on the Internal Switch
+runcmd:
+  - sudo ip addr add 192.168.100.10/24 dev eth1
+  - sudo ip link set eth1 up

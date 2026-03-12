@@ -21,6 +21,9 @@ resource "multipass_instance" "web_server" {
   image  = "noble"
   cpus   = 2
   memory = "2G"
+  networks {
+    name = "DevOps-Internal"
+  }
   
   # We read your local public key and inject it into the template
   cloud_init = templatefile("${path.module}/cloud-init.tftpl", {
@@ -46,13 +49,13 @@ resource "local_file" "ssh_config" {
       StrictHostKeyChecking no
   EOT
 }
-resource "local_file" "ansible_inventory" {
-  content  = <<-EOT
-    [web_servers]
-    prod-sim-01 ansible_host=${multipass_instance.web_server.ipv4[0]} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_multipass ansible_ssh_common_args='-o StrictHostKeyChecking=no'
-  EOT
-  filename = "${path.module}/ansible-inventory/inventory.ini"
-}
+# resource "local_file" "ansible_inventory" {
+#   content  = <<-EOT
+#     [web_servers]
+#     prod-sim-01 ansible_host=${multipass_instance.web_server.ipv4[0]} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_multipass ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+#   EOT
+#   filename = "${path.module}/ansible-inventory/inventory.ini"
+# }
 output "instance_ip" {
   value = multipass_instance.web_server.ipv4[0]
 }
