@@ -4,14 +4,32 @@
 
 ### Troubleshooting
 
+#### For Multipass itself
+
+```bash
+multipass find
+```
+
+#### For VMs
+
 ``` bash
 multipass launch -n my-test-vm --cloud-init cloud-config.yaml
+multipass launch -n my-test-vm-2 --network "name=DevOps-Internal"
 multipass shell my-test-vm
 multipass info my-test-vm
 multipass delete my-test-vm
 ```
 
-### Network setup
+### Volumes
+
+```bash
+multipass set local.privileged-mounts=true
+multipass mount ./FileServerData prod-sim-01:/srv/storage
+```
+
+### Networking
+
+#### Setup
 
 ```pwsh
 New-VMSwitch -Name "DevOps-Internal" -SwitchType Internal
@@ -27,7 +45,7 @@ sudo ip addr add 192.168.1.100/24 dev eth1 # on WLAN
 sudo ip addr add 192.168.100.10/24 dev eth1 # on DevOps-Internal
 ```
 
-### Connectivity
+#### SSH
 
 ```bash
 # Forgor the old identity first

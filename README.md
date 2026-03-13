@@ -32,6 +32,7 @@ Similarly, "**Terra at Home**" shall be the place that **brings life** to my ser
 
 - [x] IaC with Multipass
 - [ ] Figure out local Ansible approach (wsl/container/...)
+- [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Fully automated app stack setup
 - [ ] Formatting this file to look cooler...
 

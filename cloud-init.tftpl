@@ -21,7 +21,13 @@ write_files:
               - 192.168.100.10/24
               # gateway4:
               # - 192.168.100.1
-# This forces the VM to have a static IP on the Internal Switch
+bootcmd:
+  - mkdir -p /srv/storage
 runcmd:
+  # This forces the VM to have a static IP on the Internal Switch
   - sudo ip addr add 192.168.100.10/24 dev eth1
   - sudo ip link set eth1 up
+  # Permissions Setup
+  - sleep 5
+  - chown -R ubuntu:ubuntu /srv/storage
+  - chmod -R 755 /srv/storage

@@ -1,5 +1,7 @@
+*.code-workspace
 .env
 nextcloud-stack/data/
+FileServerData/
 dockersecrets.ps1
 logs/
 *.img

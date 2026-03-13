@@ -18,13 +18,20 @@ provider "multipass" {
 resource "multipass_instance" "web_server" {
   name   = "prod-sim-01"
   # ubuntu 24.04 .4 LTS
-  image  = "noble"
+  # image  = "file://C:/Users/LOQ/Downloads/noble-server-cloudimg-amd64 .img"
+  image = "file://${path.module}/images/noble-server-cloudimg-amd64.img"
   cpus   = 2
   memory = "2G"
   networks {
     name = "DevOps-Internal"
   }
-  
+
+  # The "Persistent Storage" bridge
+  # Replace with a path on your Windows/WSL host
+  mounts {
+    host_path         = "${path.module}/FileServerData"
+    instance_path = "/srv/storage"
+  }
   # We read your local public key and inject it into the template
   cloud_init = templatefile("${path.module}/cloud-init.tftpl", {
     ssh_public_key = file("~/.ssh/id_multipass.pub")
