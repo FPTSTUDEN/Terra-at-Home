@@ -18,6 +18,8 @@ multipass launch -n my-test-vm-2 --network "name=DevOps-Internal"
 multipass shell my-test-vm
 multipass info my-test-vm
 multipass delete my-test-vm
+
+last -n 5 -F
 ```
 
 ### Volumes
@@ -51,7 +53,7 @@ sudo ip addr add 192.168.100.10/24 dev eth1 # on DevOps-Internal
 # Forgor the old identity first
 ssh-keygen -f '~/.ssh/known_hosts' -R '192.168.100.10'
 #  Then ssh
-ssh -i ~/.ssh/id_multipass ubuntu@192.168.100.10
+ssh -i ~/.ssh/id_multipass ubuntu@192.168.100.10 -o StrictHostKeyChecking=no
 ```
 
 ## Ignoring perm changes on windows

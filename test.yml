@@ -1,0 +1,110 @@
+- name: Test Samba Installation
+  hosts: web_servers
+  gather_facts: yes
+  become: false  # Start without become to test user context
+  
+  tasks:
+    - name: DEBUG 1 - Who am I? (no become)
+      command: whoami
+      register: whoami_no_become
+      changed_when: false
+      
+    - name: Show current user
+      debug:
+        msg: "Current user (no become): {{ whoami_no_become.stdout }}"
+        
+    - name: DEBUG 2 - Check sudo privileges
+      command: sudo -n true
+      register: sudo_check
+      ignore_errors: yes
+      changed_when: false
+      
+    - name: Show sudo status
+      debug:
+        msg: "Passwordless sudo: {{ 'Yes' if sudo_check is success else 'No' }}"
+        
+    - name: DEBUG 3 - Environment variables
+      command: env
+      register: env_vars
+      changed_when: false
+      
+    - name: Show PATH
+      debug:
+        msg: "PATH: {{ env_vars.stdout | regex_search('PATH=([^\n]+)', '\\1') | first }}"
+        
+    - name: DEBUG 4 - Check if samba is currently installed
+      command: dpkg -l samba
+      register: samba_check
+      failed_when: false
+      changed_when: false
+      
+    - name: Show samba status
+      debug:
+        msg: "Samba installed: {{ 'Yes' if 'ii  samba' in samba_check.stdout else 'No' }}"
+        
+    - name: DEBUG 5 - Try install with become (like ad-hoc)
+      become: true
+      become_user: root
+      apt:
+        name: samba
+        state: present
+        update_cache: yes
+      register: apt_result
+      
+    - name: Show apt result
+      debug:
+        var: apt_result
+        
+    - name: DEBUG 6 - Verify installation after attempt
+      become: true
+      command: dpkg -l samba
+      register: verify_samba
+      failed_when: false
+      changed_when: false
+      
+    - name: Show verification
+      debug:
+        msg: "Samba now installed: {{ 'Yes' if 'ii  samba' in verify_samba.stdout else 'No' }}"
+        
+    - name: DEBUG 7 - Check for samba binaries
+      become: true
+      command: which samba
+      register: which_samba
+      failed_when: false
+      changed_when: false
+      
+    - name: Show samba binary location
+      debug:
+        msg: "samba binary: {{ which_samba.stdout | default('Not found') }}"
+        
+    - name: DEBUG 8 - Check APT logs for errors
+      become: true
+      command: tail -30 /var/log/apt/term.log
+      register: apt_logs
+      changed_when: false
+      
+    - name: Show recent APT logs
+      debug:
+        msg: "Last 5 lines of apt log: {{ apt_logs.stdout_lines[-5:] }}"
+        
+    - name: DEBUG 9 - Try ad-hoc style command with shell
+      become: true
+      shell: |
+        DEBIAN_FRONTEND=noninteractive apt-get update -qq
+        DEBIAN_FRONTEND=noninteractive apt-get install -y samba
+      register: shell_result
+      ignore_errors: yes
+      
+    - name: Show shell install result
+      debug:
+        var: shell_result
+        
+    - name: DEBUG 10 - Final verification
+      become: true
+      command: dpkg -l | grep samba
+      register: final_check
+      changed_when: false
+      
+    - name: All samba packages
+      debug:
+        msg: "{{ final_check.stdout_lines }}"

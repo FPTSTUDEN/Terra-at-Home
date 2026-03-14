@@ -1,28 +1,23 @@
+# ansible-playbook setup.yml -u ubuntu --become -K
 ---
 # tasks file for setup_nas
 - name: Configure Samba and Tailscale
   # hosts: web_servers
   become: true
+  become_user: root
   block:
     - name: Install Samba
+      become: true
+      become_user: root
       apt:
         name: samba
         state: present
         update_cache: yes
-      register: samba_install
-    - name: Create Samba config directory if missing
-      file:
-        path: /etc/samba
-        state: directory
-        mode: '0755'
-    - name: Ensure smb.conf exists
-      copy:
-        content: ""
-        dest: /etc/samba/smb.conf
-        force: no  # Only creates it if it's actually missing
+        # cache_valid_time: 0  # Force cache update
     - name: Configure Samba Share
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: /etc/samba/smb.conf
+        # create: yes
         block: |
           [DevOpsShare]
              comment = Persistent Lab Storage
@@ -31,21 +26,27 @@
              browsable = yes
              guest ok = yes
              force user = ubuntu
+    - name: Verify file content immediately
+      ansible.builtin.shell: cat /etc/samba/smb.conf
+      register: smb_content
 
+    - name: Show the content Ansible sees
+      ansible.builtin.debug:
+        var: smb_content.stdout_lines
     - name: Restart Samba
       service:
         name: smbd
         state: restarted
 
-    - name: Install Tailscale
-      shell: "curl -fsSL https://tailscale.com/install.sh | sh"
-      args:
-        creates: /usr/bin/tailscale
+    # - name: Install Tailscale
+    #   shell: "curl -fsSL https://tailscale.com/install.sh | sh"
+    #   args:
+    #     creates: /usr/bin/tailscale
 
-    - name: Bring Tailscale Up using OAuth
-      command: >
-        tailscale up 
-        --authkey="tskey-client-{{ ts_client_id }}-{{ ts_client_secret }}"
-        --hostname="devops-lab-vm"
-      # no_log is CRITICAL so your secret doesn't leak in the terminal output
-      no_log: true
+    # - name: Bring Tailscale Up using OAuth
+    #   command: >
+    #     tailscale up 
+    #     --authkey="tskey-client-{{ ts_client_id }}-{{ ts_client_secret }}"
+    #     --hostname="devops-lab-vm"
+    #   # no_log is CRITICAL so your secret doesn't leak in the terminal output
+    #   no_log: true

@@ -1,0 +1,14 @@
+# tasks file for ansible-roles/print_hostname
+---
+- name: Print target machine hostname
+  # hosts: all
+  # gather_facts: yes  # Required to collect ansible_hostname
+
+  block:
+    - name: Show discovered hostname
+      debug:
+        msg: "Discovered hostname: {{ ansible_hostname }}"
+
+    - name: Show inventory hostname
+      debug:
+        msg: "Inventory hostname: {{ inventory_hostname }}"
