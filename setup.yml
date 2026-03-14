@@ -1,0 +1,5 @@
+- name: Setup nas docker etc
+  hosts: all
+  become: true
+  roles:
+    - ansible-roles/setup_nas

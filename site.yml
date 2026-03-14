@@ -1,5 +1,5 @@
 - name: Setup Common Configurations
   hosts: all
-  become: yes
+  become: true
   roles:
     - ansible-roles/common

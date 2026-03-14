@@ -15,8 +15,8 @@ def get_oauth_credentials():
 
 def tailscale_oauth_check():
     client_id, client_secret = get_oauth_credentials()
-    print(f"Client ID: {client_id}")
-    print(f"Client Secret: {client_secret}")
+    # print(f"Client ID: {client_id}")
+    # print(f"Client Secret: {client_secret}")
     # Here you would add the logic to check OAuth credentials with Tailscale
     # For example, making an API call to Tailscale with these credentials
     response = requests.post(
