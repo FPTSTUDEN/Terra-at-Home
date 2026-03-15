@@ -1,14 +1,14 @@
-# ansible-playbook setup.yml -u ubuntu --become -K
+# ansible-playbook setup.yml -u ubuntu --become --ask-vault-pass
 ---
 # tasks file for setup_nas
+- name: Include vault variables first
+  include_vars: secrets.yml
 - name: Configure Samba and Tailscale
   # hosts: web_servers
   become: true
   become_user: root
   block:
     - name: Install Samba
-      become: true
-      become_user: root
       apt:
         name: samba
         state: present
@@ -27,9 +27,8 @@
              guest ok = yes
              force user = ubuntu
     - name: Verify file content immediately
-      ansible.builtin.shell: cat /etc/samba/smb.conf
+      ansible.builtin.shell: "cat /etc/samba/smb.conf | tail -8" 
       register: smb_content
-
     - name: Show the content Ansible sees
       ansible.builtin.debug:
         var: smb_content.stdout_lines
@@ -38,15 +37,14 @@
         name: smbd
         state: restarted
 
-    # - name: Install Tailscale
-    #   shell: "curl -fsSL https://tailscale.com/install.sh | sh"
-    #   args:
-    #     creates: /usr/bin/tailscale
+    - name: Install Tailscale
+      shell: "curl -fsSL https://tailscale.com/install.sh | sh"
+      args:
+        creates: /usr/bin/tailscale
 
-    # - name: Bring Tailscale Up using OAuth
-    #   command: >
-    #     tailscale up 
-    #     --authkey="tskey-client-{{ ts_client_id }}-{{ ts_client_secret }}"
-    #     --hostname="devops-lab-vm"
-    #   # no_log is CRITICAL so your secret doesn't leak in the terminal output
-    #   no_log: true
+    - name: Bring Tailscale Up using OAuth
+      command: >
+        tailscale up --auth-key='{{vault_ts_client_secret}}?ephemeral=false&preauthorized=true' --advertise-tags=tag:tds
+        --hostname="devops-lab"
+      # no_log is CRITICAL so your secret doesn't leak in the terminal output
+      no_log: true

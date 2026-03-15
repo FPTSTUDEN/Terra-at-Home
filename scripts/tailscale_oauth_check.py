@@ -46,4 +46,4 @@ def check_2():
     else:
         print("Failed to create a key with OAuth credentials.")
         print(f"Response: {response.status_code} - {response.text}")
-# check_2()
+check_2()
