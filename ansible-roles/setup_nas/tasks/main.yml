@@ -10,7 +10,9 @@
   block:
     - name: Install Samba
       apt:
-        name: samba
+        name:
+          - samba
+          - smbclient
         state: present
         update_cache: yes
         # cache_valid_time: 0  # Force cache update
@@ -32,6 +34,14 @@
     - name: Show the content Ansible sees
       ansible.builtin.debug:
         var: smb_content.stdout_lines
+    - name: Create Samba user with password
+      shell: |
+        (echo "{{ vault_samba_password }}"; echo "{{ vault_samba_password }}") | smbpasswd -s -a ubuntu
+      args:
+        creates: /var/lib/samba/private/passdb.tdb
+      no_log: true
+    - name: Enable Samba users
+      shell: smbpasswd -e ubuntu
     - name: Restart Samba
       service:
         name: smbd
