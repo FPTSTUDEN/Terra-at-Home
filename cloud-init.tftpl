@@ -1,4 +1,9 @@
 #cloud-config
+  # 60022480f517b051bdad222a41db47f9                 80cab42a-400c-4056-99b0-4edb3d24e80e
+  #lsblk
+  #sudo blkid
+  # ls /srv/storage
+  #findmnt /srv/storage # slightly less reliable
 users:
   - name: ubuntu
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -6,28 +11,35 @@ users:
     ssh_authorized_keys:
       - ${ssh_public_key}
 
+# mounts:
+#   - [ LABEL=lab_data, /srv/storage, "ext4", "defaults,nofail", "0", "2" ]
 package_update: true
 packages:
-  - docker.io
+  # - docker.io # temporarily disabled
   - git
-write_files:
-  - path: /etc/netplan/50-cloud-init.yaml
-    content: |
-      network:
-        version: 2
-        ethernets:
-          eth1:
-            addresses:
-              - 192.168.100.10/24
-              # gateway4:
-              # - 192.168.100.1
+# write_files:
+#   - path: /etc/netplan/50-cloud-init.yaml
+#     content: |
+#       network:
+#         version: 2
+#         ethernets:
+#           eth1:
+#             addresses:
+#               - 192.168.100.10/24
+#               # gateway4:
+#               # - 192.168.100.1
+
 bootcmd:
   - mkdir -p /srv/storage
 runcmd:
+  # sudo cat /var/log/cloud-init-output.log
+  # - blkid /dev/sdb || mkfs.ext4 /dev/sdb
+  # - sudo mount -L lab_data /srv/storage || mount /dev/sdb /srv/storage
   # This forces the VM to have a static IP on the Internal Switch
   - sudo ip addr add 192.168.100.10/24 dev eth1
   - sudo ip link set eth1 up
+  # - netplan apply
   # Permissions Setup
-  - sleep 5
+  - sleep 3
   - chown -R ubuntu:ubuntu /srv/storage
   - chmod -R 755 /srv/storage

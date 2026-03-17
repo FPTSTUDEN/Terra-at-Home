@@ -26,7 +26,20 @@ last -n 5 -F
 
 ```bash
 multipass set local.privileged-mounts=true
-multipass mount ./FileServerData prod-sim-01:/srv/storage
+# multipass mount ./FileServerData prod-sim-01:/srv/storage
+
+sudo e2label /dev/sdb lab_data
+
+# 1. Create the filesystem (ONLY DO THIS ONCE)
+sudo mkfs.ext4 /dev/sdb
+
+# 2. Refresh blkid to confirm it's now visible
+sudo blkid /dev/sdb
+
+# 3. Mount it manually to test
+sudo mount /dev/sdb /srv/storage
+# 4. Refresh systemd
+sudo systemctl daemon-reload
 ```
 
 ### Networking

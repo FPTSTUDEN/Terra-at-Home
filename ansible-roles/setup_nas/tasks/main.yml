@@ -3,6 +3,29 @@
 # tasks file for setup_nas
 - name: Include vault variables first
   include_vars: secrets.yml
+- name: Infrastructure - Wait for Persistent VHDX
+  ansible.builtin.command: lsblk -f
+  register: disk_output
+  # This loop runs in the background and won't stop other VM processes
+  until: "'lab_data' in disk_output.stdout"
+  retries: 20
+  delay: 5
+  changed_when: false
+
+- name: Infrastructure - Mount Persistent Storage
+  ansible.posix.mount:
+    path: /srv/storage
+    src: LABEL=lab_data
+    fstype: ext4
+    state: mounted
+
+- name: Permissions - Ensure Ubuntu ownership
+  ansible.builtin.file:
+    path: /srv/storage
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
+    recurse: yes
 - name: Configure Samba and Tailscale
   # hosts: web_servers
   become: true
@@ -37,8 +60,8 @@
     - name: Create Samba user with password
       shell: |
         (echo "{{ vault_samba_password }}"; echo "{{ vault_samba_password }}") | smbpasswd -s -a ubuntu
-      args:
-        creates: /var/lib/samba/private/passdb.tdb
+      # args:
+      #   creates: /var/lib/samba/private/passdb.tdb
       no_log: true
     - name: Enable Samba users
       shell: smbpasswd -e ubuntu

@@ -1,0 +1,46 @@
+---
+- name: Emergency Mount & Service Reset
+  hosts: all
+  become: true
+  become_user: root
+  # gather_facts: no  # Saves time by skipping hardware discovery
+  tasks:
+    - name: 1. Stop locking services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - smbd
+        - nmbd
+      ignore_errors: yes
+
+    - name: 2. Force release kernel locks
+      ansible.builtin.shell: "fuser -kv /srv/storage || true"
+      register: fuser_out
+
+    - name: 3. Lazy unmount (Internal)
+      ansible.builtin.mount:
+        path: /srv/storage
+        state: unmounted
+
+    - name: 4. Verification Pause
+      ansible.builtin.pause:
+        prompt: "Check your Windows Host now. If 'multipass mount' failed, run it manually then press Enter."
+
+    - name: 5. Restart Services
+      ansible.builtin.service:
+        name: smbd
+        state: started
+    - name: 5.5. Re-mount (Internal)
+      ansible.builtin.mount:
+        path: /srv/storage
+        state: mounted
+
+    - name: 6. Health Check
+      ansible.builtin.command: testparm -s
+      register: samba_check
+      changed_when: false
+
+    - name: Show Samba Status
+      ansible.builtin.debug:
+        msg: "Samba Share [DevOpsShare] is online: {{ 'DevOpsShare' in samba_check.stdout }}"

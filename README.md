@@ -32,7 +32,7 @@ Similarly, "**Terra at Home**" shall be the place that **brings life** to my ser
 
 - [x] IaC with Multipass
 - [x] Figure out local Ansible approach (wsl)
-- [ ] Folder got unmounted after restart (fix by automated terraform & ansible maybe)
+- [ ] Remove old Tailscale device before adding new one for consistent naming
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Fully automated app stack setup
 - [ ] Formatting this file to look cooler...

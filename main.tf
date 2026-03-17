@@ -12,26 +12,21 @@ terraform {
 provider "multipass" {
   # Increase this to 5 minutes (300 seconds)
   # This gives Hyper-V enough time to bridge the network
-  command_timeout = 300
+  command_timeout = 420
 }
 
-resource "multipass_instance" "web_server" {
+resource "multipass_instance" "prod-sim" {
   name   = "prod-sim-01"
   # ubuntu 24.04 .4 LTS
   # image  = "file://C:/Users/LOQ/Downloads/noble-server-cloudimg-amd64 .img"
   image = "file://${path.module}/images/noble-server-cloudimg-amd64.img"
   cpus   = 2
   memory = "2G"
+  # disk = "10G"
   networks {
     name = "DevOps-Internal"
   }
 
-  # The "Persistent Storage" bridge
-  # Replace with a path on your Windows/WSL host
-  mounts {
-    host_path         = "${path.module}/FileServerData"
-    instance_path = "/srv/storage"
-  }
   # We read your local public key and inject it into the template
   cloud_init = templatefile("${path.module}/cloud-init.tftpl", {
     ssh_public_key = file("~/.ssh/id_multipass.pub")
@@ -45,12 +40,27 @@ resource "multipass_instance" "web_server" {
   #   delete = "5m"
   # }
 }
+resource "null_resource" "attach_vhdx" {
+  depends_on = [multipass_instance.prod-sim]
+
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-Command"]
+    command     = <<EOT
+      $projectDir = Get-Location
+      $vhdPath = "$projectDir\FileServerData\persistent-storage.vhdx"
+      
+      $script = "Add-VMHardDiskDrive -VMName ${multipass_instance.prod-sim.name} -Path '$vhdPath' -ControllerType SCSI"
+      
+      Start-Process powershell -Verb RunAs -Wait -ArgumentList "-NoProfile", "-Command", $script
+    EOT
+  }
+}
 resource "local_file" "ssh_config" {
   filename        = "${path.module}/ssh_config"
   file_permission = "0600"
   content         = <<-EOT
     Host prod-sim
-      HostName ${multipass_instance.web_server.ipv4[0]}
+      HostName ${multipass_instance.prod-sim.ipv4[0]}
       User ubuntu
       IdentityFile ~/.ssh/id_multipass
       StrictHostKeyChecking no
@@ -58,11 +68,11 @@ resource "local_file" "ssh_config" {
 }
 # resource "local_file" "ansible_inventory" {
 #   content  = <<-EOT
-#     [web_servers]
-#     prod-sim-01 ansible_host=${multipass_instance.web_server.ipv4[0]} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_multipass ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+#     [prod-sims]
+#     prod-sim-01 ansible_host=${multipass_instance.prod-sim.ipv4[0]} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_multipass ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 #   EOT
 #   filename = "${path.module}/ansible-inventory/inventory.ini"
 # }
 output "instance_ip" {
-  value = multipass_instance.web_server.ipv4[0]
+  value = multipass_instance.prod-sim.ipv4[0]
 }
