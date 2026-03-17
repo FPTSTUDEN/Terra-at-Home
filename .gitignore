@@ -1,5 +1,6 @@
 *.code-workspace
-.env
+*.env
+.vscode/
 nextcloud-stack/data/
 FileServerData/
 dockersecrets.ps1

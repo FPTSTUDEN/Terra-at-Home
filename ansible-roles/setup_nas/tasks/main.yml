@@ -77,7 +77,7 @@
 
     - name: Bring Tailscale Up using OAuth
       command: >
-        tailscale up --auth-key='{{vault_ts_client_secret}}?ephemeral=false&preauthorized=true' --advertise-tags=tag:tds
+        tailscale up --auth-key='{{vault_ts_client_secret}}?ephemeral=true&preauthorized=true' --advertise-tags=tag:tds
         --hostname="devops-lab"
       # no_log is CRITICAL so your secret doesn't leak in the terminal output
       no_log: true
