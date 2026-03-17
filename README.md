@@ -8,11 +8,9 @@
 
 > <img align="right" alt="earth-chan" src=".misc\earth-chan-with-watering-can-v0-f0616jur8mab1.webp" width=25% height=25%>
 <!-- <div> -->
-The resemblance of my entire server's **configuration, deployments and app stack** in one centralised repository
-
 > "**Terra**", or **Earth**, is the Third planet of the Solar System, the only one known so far to **harbor life**.
 
-Similarly, "**Terra at Home**" shall be the place that **brings life** to my server and my programming journey.
+Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Code - shall be the place that **brings life** to my server and my programming journey.
 <!-- </div> -->
 
 **Featuring...**
@@ -32,27 +30,44 @@ Similarly, "**Terra at Home**" shall be the place that **brings life** to my ser
 
 - [x] IaC with Multipass
 - [x] Figure out local Ansible approach (wsl)
-- [ ] Remove old Tailscale device before adding new one for consistent naming
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Fully automated app stack setup
 - [ ] Formatting this file to look cooler...
 
-## Features list
+## Features
 
-### Secured networking
+This project automates a high-performance DevOps environment using Terraform, Ansible, and Multipass on a Windows host.
 
-- **Tailscale**  - secured VPN for devices
+### Architecture
+
+#### IaC 🌳
+
+- Hyper-V (with Multipass) as hypervisor
+- Terraform for VM lifecycle and hardware provisioning
+
+#### CM ⚙️
+
+- Ansible for service configuration (Samba, Tailscale, Docker)
+
+#### Networking 🛜
+
+- Hybrid Mesh VPN (Tailscale) with a static Internal Switch bridge
 - **TSDProxy** - Tailscale domain names for containerised services
 
-### Containerised app stacks
+### App stack
 
 - **NextCloud stack** - Cloud storage & cross-device file syncthing
 - Other apps:
   - Obsidian
 
-### Automated scripts
+### Scripts
 
-#### Secret-checker scripts
+#### Server management
+
+- ```manage.ps1``` as a dashboard to quickly manage infrastructure's lifecycle
+- ```setup.sh``` as an automated cleanup & service configuration script
+
+#### Misc
 
 - **Sensitivity Finder**
   - ```./sensfind.sh directory-name```
