@@ -1,0 +1,60 @@
+---
+# tasks file for setup_apps
+# ansible-playbook setup.yml -u ubuntu --become
+- name: Setup apps with root
+  become: true
+  become_user: root
+  block:
+  # - name: Docker - Create keyrings directory
+  #   ansible.builtin.file:
+  #     path: /etc/apt/keyrings
+  #     state: directory
+  #     mode: '0755'
+  # - name: Docker - Download GPG Key
+  #   ansible.builtin.get_url:
+  #     url: https://download.docker.com/linux/ubuntu/gpg
+  #     dest: /etc/apt/keyrings/docker.asc
+  #     mode: '0644'
+  # - name: Docker - Configure DEB822 Repository
+  #   ansible.builtin.deb822_repository:
+  #     name: docker
+  #     types: [deb]
+  #     uris: ["https://download.docker.com/linux/ubuntu"]
+  #     suites: ["{{ ansible_distribution_release }}"]
+  #     components: [stable]
+  #     signed_by: /etc/apt/keyrings/docker.asc
+  #     state: present
+  # - name: Docker - Install Official Engine and Plugins
+  #   ansible.builtin.apt:
+  #     name:
+  #       - docker-ce
+  #       - docker-ce-cli
+  #       - containerd.io
+  #       - docker-buildx-plugin
+  #       - docker-compose-plugin
+  #     state: present
+  #     update_cache: yes
+
+  - name: Media Pipeline - Ensure Storage Folders
+    ansible.builtin.file:
+      path: "/srv/storage/{{ item }}"
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: '0755'
+    loop:
+      - video_in
+      - video_out
+      - scripts
+
+  - name: Media Pipeline - Copy Compose File
+    ansible.builtin.copy:
+      src: ../../apps/video_converter/compose.yaml
+      dest: /srv/storage/scripts/compose.yaml
+      mode: '0644'
+
+  - name: Media Pipeline - Deploy via Docker Compose
+    community.docker.docker_compose_v2:
+      project_src: /srv/storage/scripts/
+      state: present
+      pull: always
