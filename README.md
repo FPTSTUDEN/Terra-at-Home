@@ -13,7 +13,7 @@
 Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Code - shall be the place that **brings life** to my server and my programming journey.
 <!-- </div> -->
 
-**Featuring...**
+**Skills I learned**
 
 ![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
@@ -30,6 +30,9 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 
 - [x] IaC with Multipass
 - [x] Figure out local Ansible approach (wsl)
+- [ ] AWS localstack on local or VM??
+- [ ] video to .MOV auto-converter cause I'm using Iphone... (Watchdog container with FFmpeg /~~Synced local folder -lambda-> .MOV -?-> VM hard disk~~)
+- [ ] Nextcloud
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Fully automated app stack setup
 - [ ] Formatting this file to look cooler...
