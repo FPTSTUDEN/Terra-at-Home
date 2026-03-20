@@ -11,11 +11,26 @@ users:
     ssh_authorized_keys:
       - ${ssh_public_key}
 
+apt:
+  sources:
+    docker.sources:
+      source: |
+        Types: deb
+        URIs: https://download.docker.com/linux/ubuntu
+        Suites: $RELEASE
+        Components: stable
+        Signed-By: /etc/apt/keyrings/docker.asc
 # mounts:
 #   - [ LABEL=lab_data, /srv/storage, "ext4", "defaults,nofail", "0", "2" ]
 package_update: true
 packages:
-  # - docker.io # temporarily disabled
+  - ca-certificates
+  - curl
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
   - git
 # write_files:
 #   - path: /etc/netplan/50-cloud-init.yaml
@@ -39,7 +54,15 @@ runcmd:
   - sudo ip addr add 192.168.100.10/24 dev eth1
   - sudo ip link set eth1 up
   # - netplan apply
+  # Ensure the keyring directory exists before apt runs (cloud-init stage logic)
+  - mkdir -p /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  - chmod a+r /etc/apt/keyrings/docker.asc
+
+  - usermod -aG docker ubuntu
+  # Restart docker to ensure group permissions apply if you added 'ubuntu' to docker group
+  - systemctl enable --now docker
+  - chown root:docker /var/run/docker.sock
   # Permissions Setup
-  - sleep 3
   - chown -R ubuntu:ubuntu /srv/storage
   - chmod -R 755 /srv/storage
