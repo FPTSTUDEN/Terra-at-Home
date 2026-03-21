@@ -21,7 +21,7 @@ resource "multipass_instance" "prod-sim" {
   # image  = "file://C:/Users/LOQ/Downloads/noble-server-cloudimg-amd64 .img"
   image = "file://${path.module}/images/noble-server-cloudimg-amd64.img"
   cpus   = 2
-  memory = "2G"
+  memory = "4G"
   # disk = "10G"
   networks {
     name = "DevOps-Internal"

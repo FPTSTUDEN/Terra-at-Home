@@ -75,7 +75,18 @@ ssh -i ~/.ssh/id_multipass ubuntu@192.168.100.10 -o StrictHostKeyChecking=no
 git config core.filemode false
 ```
 
-## Docker secrets
+## Docker
+
+### Docker Swarm
+
+```bash
+docker service ps nextcloud_db --no-trunc
+docker service logs nextcloud_nextcloud 
+--tail 100
+docker service inspect nextcloud_nextcloud
+```
+
+### Docker secrets
 
 ```bash
 docker secret rm tsclientSecret
