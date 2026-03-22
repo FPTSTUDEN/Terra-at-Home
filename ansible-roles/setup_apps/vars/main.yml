@@ -2,5 +2,6 @@
 # vars file for setup_apps
 data_root: /srv/storage/data
 nextcloud_port: 8121
-nextcloud_trusted_domains: "localhost,nextcloud.localhost,100.0.0.0/8,100.116.1.22,100.111.36.98,100.73.89.21"
+# add any related IP of server & clients
+nextcloud_trusted_domains: "localhost nextcloud.localhost 100.0.0.0/8 100.116.1.22 100.111.36.98 100.73.89.21 192.160.100.10 100.118.110.61"
 ts_ip: "100.118.110.61"

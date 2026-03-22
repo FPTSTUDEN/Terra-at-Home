@@ -75,12 +75,16 @@ services:
       REDIS_HOST: redis
       NEXTCLOUD_ADMIN_USER: "{{ nextcloud_admin_user }}"
       NEXTCLOUD_ADMIN_PASSWORD: "{{ nextcloud_admin_password }}"
-      NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_trusted_domains }}"
-      APACHE_SERVER_NAME: "localhost"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_trusted_domains | replace(',', ' ') }}"
+      APACHE_SERVER_NAME: {{ nextcloud_trusted_domains | first }}
+      # Use this to specifically suppress the FQDN warning
+      SERVERNAME: {{ nextcloud_trusted_domains | first }}
+      APACHE_SERVER_ALIAS: localhost {{ ts_ip }}
       PHP_MEMORY_LIMIT: 512M
       PHP_UPLOAD_LIMIT: 512M
     volumes:
       - {{ data_root }}/nextcloud:/var/www/html
+      - ./apache-servername.conf:/etc/apache2/conf-enabled/servername.conf:ro
     labels:
       - tsdproxy.enable=true
       - tsdproxy.ephemeral=false

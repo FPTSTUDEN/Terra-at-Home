@@ -12,6 +12,7 @@
   #     path: /etc/apt/keyrings
   #     state: directory
   #     mode: '0755'
+
   # - name: Docker - Download GPG Key
   #   ansible.builtin.get_url:
   #     url: https://download.docker.com/linux/ubuntu/gpg
@@ -71,36 +72,36 @@
   #     state: present
   #     pull: always
 
-  # - name: Create data directories
-  #   file:
-  #     path: "{{ item }}"
-  #     state: directory
-  #     owner: "33"
-  #     group: "33"
-  #     mode: '0755'
-  #   loop:
-  #     - "{{ data_root }}/postgres"
-  #     - "{{ data_root }}/redis"
-  #     - "{{ data_root }}/nextcloud"
+  - name: Create data directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "33"
+      group: "33"
+      mode: '0755'
+    loop:
+      - "{{ data_root }}/postgres"
+      - "{{ data_root }}/redis"
+      - "{{ data_root }}/nextcloud"
   
-  # - name: Initialize Docker Swarm
-  #   docker_swarm:
-  #     state: present
-  #     advertise_addr: "{{ ansible_default_ipv4.address }}"
-  #   register: swarm_init
+  - name: Initialize Docker Swarm
+    docker_swarm:
+      state: present
+      advertise_addr: "{{ ansible_default_ipv4.address }}"
+    register: swarm_init
   
-  # - name: Create Docker secrets
-  #   docker_secret:
-  #     name: "{{ item.name }}"
-  #     data: "{{ item.value }}"
-  #     state: present
-  #   loop:
-  #     - { name: "postgres_db", value: "{{ postgres_db }}" }
-  #     - { name: "postgres_user", value: "{{ postgres_user }}" }
-  #     - { name: "postgres_password", value: "{{ postgres_password }}" }
-  #     - { name: "nextcloud_admin_user", value: "{{ nextcloud_admin_user }}" }
-  #     - { name: "nextcloud_admin_password", value: "{{ nextcloud_admin_password }}" }
-  #   no_log: true
+  - name: Create Docker secrets
+    docker_secret:
+      name: "{{ item.name }}"
+      data: "{{ item.value }}"
+      state: present
+    loop:
+      - { name: "postgres_db", value: "{{ postgres_db }}" }
+      - { name: "postgres_user", value: "{{ postgres_user }}" }
+      - { name: "postgres_password", value: "{{ postgres_password }}" }
+      - { name: "nextcloud_admin_user", value: "{{ nextcloud_admin_user }}" }
+      - { name: "nextcloud_admin_password", value: "{{ nextcloud_admin_password }}" }
+    no_log: true
   
   - name: Create stack directory
     file:
@@ -112,6 +113,12 @@
     template:
       src: ../../apps/nextcloud/docker-compose.yml.j2
       dest: /opt/nextcloud/docker-compose.yml
+      mode: '0644'
+  
+  - name: Deploy docker-compose config file
+    ansible.builtin.copy:
+      src: ../../apps/nextcloud/apache-servername.conf
+      dest: /opt/nextcloud/apache-servername.conf
       mode: '0644'
 
   - name: Remove existing stack if present
