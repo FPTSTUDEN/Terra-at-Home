@@ -1,6 +1,8 @@
 ---
 # tasks file for setup_apps
 # ansible-playbook setup.yml -u ubuntu --become
+- name: Include vault variables first
+  include_vars: secrets.yml
 - name: Setup apps with root
   become: true
   become_user: root
@@ -32,29 +34,111 @@
   #       - containerd.io
   #       - docker-buildx-plugin
   #       - docker-compose-plugin
+  #       - python3-pip
+  #       - python3-setuptools
+  #       - python3-venv
+  #       - python3-jsondiff
   #     state: present
   #     update_cache: yes
 
-  - name: Media Pipeline - Ensure Storage Folders
-    ansible.builtin.file:
-      path: "/srv/storage/{{ item }}"
-      state: directory
-      owner: ubuntu
-      group: ubuntu
-      mode: '0755'
-    loop:
-      - video_in
-      - video_out
-      - scripts
+  # - name: Docker - Create image directory
+  #   ansible.builtin.file:
+  #     path:  /srv/storage/docker
+  #     state: directory
+  #     mode: '0755'
+  
+  # - name: Media Pipeline - Ensure Storage Folders
+  #   ansible.builtin.file:
+  #     path: "/srv/storage/{{ item }}"
+  #     state: directory
+  #     owner: ubuntu
+  #     group: ubuntu
+  #     mode: '0755'
+  #   loop:
+  #     - video_in
+  #     - video_out
+  #     - scripts
 
-  - name: Media Pipeline - Copy Compose File
-    ansible.builtin.copy:
-      src: ../../apps/video_converter/compose.yaml
-      dest: /srv/storage/scripts/compose.yaml
+  # - name: Media Pipeline - Copy Compose File
+  #   ansible.builtin.copy:
+  #     src: ../../apps/video_converter/compose.yaml
+  #     dest: /srv/storage/scripts/compose.yaml
+  #     mode: '0644'
+
+  # - name: Media Pipeline - Deploy via Docker Compose
+  #   community.docker.docker_compose_v2:
+  #     project_src: /srv/storage/scripts/
+  #     state: present
+  #     pull: always
+
+  # - name: Create data directories
+  #   file:
+  #     path: "{{ item }}"
+  #     state: directory
+  #     owner: "33"
+  #     group: "33"
+  #     mode: '0755'
+  #   loop:
+  #     - "{{ data_root }}/postgres"
+  #     - "{{ data_root }}/redis"
+  #     - "{{ data_root }}/nextcloud"
+  
+  # - name: Initialize Docker Swarm
+  #   docker_swarm:
+  #     state: present
+  #     advertise_addr: "{{ ansible_default_ipv4.address }}"
+  #   register: swarm_init
+  
+  # - name: Create Docker secrets
+  #   docker_secret:
+  #     name: "{{ item.name }}"
+  #     data: "{{ item.value }}"
+  #     state: present
+  #   loop:
+  #     - { name: "postgres_db", value: "{{ postgres_db }}" }
+  #     - { name: "postgres_user", value: "{{ postgres_user }}" }
+  #     - { name: "postgres_password", value: "{{ postgres_password }}" }
+  #     - { name: "nextcloud_admin_user", value: "{{ nextcloud_admin_user }}" }
+  #     - { name: "nextcloud_admin_password", value: "{{ nextcloud_admin_password }}" }
+  #   no_log: true
+  
+  - name: Create stack directory
+    file:
+      path: /opt/nextcloud
+      state: directory
+      mode: '0755'
+  
+  - name: Deploy docker-compose stack file
+    template:
+      src: ../../apps/nextcloud/docker-compose.yml.j2
+      dest: /opt/nextcloud/docker-compose.yml
       mode: '0644'
 
-  - name: Media Pipeline - Deploy via Docker Compose
-    community.docker.docker_compose_v2:
-      project_src: /srv/storage/scripts/
+  - name: Remove existing stack if present
+    command: docker stack rm nextcloud
+    register: stack_remove
+    ignore_errors: true
+    changed_when: "'Removing service' in stack_remove.stdout"
+  
+  - name: Wait for stack cleanup
+    pause:
+      seconds: 10
+    when: stack_remove.changed
+
+  - name: Deploy stack to Swarm
+    docker_stack:
+      name: nextcloud
+      compose:
+        - /opt/nextcloud/docker-compose.yml
       state: present
-      pull: always
+  
+  - name: Wait for services to be ready
+    command: docker service ls --filter name=nextcloud --format "{% raw %}{{.Replicas}}{% endraw %}"
+    register: service_status
+    until: "'1/1' in service_status.stdout"
+    retries: 30
+    delay: 10
+  
+  - name: Show deployment status
+    debug:
+      msg: "Nextcloud deployed successfully! Access at http://{{ ansible_default_ipv4.address }}:{{ nextcloud_port }}"

@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  db:
+    image: docker.io/postgres:16-alpine
+    # restart: unless-stopped
+    secrets:
+      - postgres_db
+      - postgres_user
+      - postgres_password
+    environment:
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - {{ data_root }}/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ postgres_user }} -d {{ postgres_db }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - nextcloud-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis:
+    image: docker.io/redis:7-alpine
+    # restart: unless-stopped
+    volumes:
+      - {{ data_root }}/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - nextcloud-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  nextcloud:
+    image: docker.io/nextcloud:33
+    # restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    ports:
+      - target: 80
+        published: {{ nextcloud_port }}
+        protocol: tcp
+        mode: host
+    secrets:
+      - postgres_db
+      - postgres_user
+      - postgres_password
+      - nextcloud_admin_user
+      - nextcloud_admin_password
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      REDIS_HOST: redis
+      NEXTCLOUD_ADMIN_USER: "{{ nextcloud_admin_user }}"
+      NEXTCLOUD_ADMIN_PASSWORD: "{{ nextcloud_admin_password }}"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_trusted_domains }}"
+      APACHE_SERVER_NAME: "localhost"
+      PHP_MEMORY_LIMIT: 512M
+      PHP_UPLOAD_LIMIT: 512M
+    volumes:
+      - {{ data_root }}/nextcloud:/var/www/html
+    labels:
+      - tsdproxy.enable=true
+      - tsdproxy.ephemeral=false
+    networks:
+      - nextcloud-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  nextcloud-cron:
+    image: docker.io/nextcloud:33
+    # restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    secrets:
+      - postgres_db
+      - postgres_user
+      - postgres_password
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      REDIS_HOST: redis
+    volumes:
+      - {{ data_root }}/nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    networks:
+      - nextcloud-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  nextcloud-net:
+    driver: overlay
+    attachable: true
+
+secrets:
+  postgres_db:
+    external: true
+  postgres_user:
+    external: true
+  postgres_password:
+    external: true
+  nextcloud_admin_user:
+    external: true
+  nextcloud_admin_password:
+    external: true

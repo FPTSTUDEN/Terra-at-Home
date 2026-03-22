@@ -80,10 +80,13 @@ git config core.filemode false
 ### Docker Swarm
 
 ```bash
+docker service ls
+
 docker service ps nextcloud_db --no-trunc
-docker service logs nextcloud_nextcloud 
+docker service logs nextcloud_db
 --tail 100
-docker service inspect nextcloud_nextcloud
+
+docker service inspect nextcloud_db
 ```
 
 ### Docker secrets

@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - /srv/storage/data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     container_name: redis
     volumes:
-      - ./data/redis:/data
+      - /srv/storage/data/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -52,7 +52,7 @@ services:
       APACHE_SERVER_NAME: Nextcloud.localhost
       APACHE_SERVER_ALIAS: localhost ${TS_IP} 
     volumes:
-      - ./data/nextcloud:/var/www/html
+      - /srv/storage/data/nextcloud:/var/www/html
     labels:
       - tsdproxy.enable=true
       - tsdproxy.ephemeral=false
@@ -72,4 +72,4 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_HOST: redis
     volumes:
-      - ./data/nextcloud:/var/www/html
+      - /srv/storage/data/nextcloud:/var/www/html

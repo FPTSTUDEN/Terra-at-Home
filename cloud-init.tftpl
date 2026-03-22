@@ -4,6 +4,10 @@
   #sudo blkid
   # ls /srv/storage
   #findmnt /srv/storage # slightly less reliable
+# growpart:
+#   mode: auto
+#   devices: ['/']
+#   ignore_growroot_disabled: false
 users:
   - name: ubuntu
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -20,6 +24,7 @@ packages:
   - python3-setuptools
   - python3-venv
   - python3-jsondiff
+  - python3-docker
   - git
 # write_files:
 #   - path: /etc/netplan/50-cloud-init.yaml
@@ -44,6 +49,10 @@ runcmd:
   - sudo ip link set eth1 up
   # - netplan apply
   # Ensure the keyring directory exists before apt runs (cloud-init stage logic)
+  # 1. Ensure the directory exists on the 50GB drive
+  # - mkdir -p /srv/storage/docker
+  
+  # 2. Install Docker
   - mkdir -p /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
   - chmod a+r /etc/apt/keyrings/docker.asc
@@ -57,6 +66,11 @@ runcmd:
     EOF
   - apt-get update
   - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  - pip3 install --break-system-packages docker
+  # 3. Reload and Restart to pick up the new data-root
+  - systemctl daemon-reload
+  - systemctl restart docker
+
   - usermod -aG docker ubuntu
   # Restart docker to ensure group permissions apply if you added 'ubuntu' to docker group
   - systemctl enable --now docker
