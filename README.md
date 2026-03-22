@@ -24,18 +24,17 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 ![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 ## TO-DO
 
-- [x] IaC with Multipass
-- [x] Figure out local Ansible approach (wsl)
-- [ ] AWS localstack on local or VM??
-- [ ] video to .MOV auto-converter cause I'm using Iphone... (Watchdog container with FFmpeg /~~Synced local folder -lambda-> .MOV -?-> VM hard disk~~)
+- [x] video to .MOV auto-converter cause I'm using Iphone... (Watchdog container with FFmpeg /~~Synced local folder -lambda-> .MOV -?-> VM hard disk~~)
+- [ ] What to do with AWS localstack (also, local or VM??)
 - [ ] Nextcloud
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Fully automated app stack setup
 - [ ] Formatting this file to look cooler...
+
+- [ ] Container security
 
 ## Features
 
