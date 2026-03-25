@@ -87,6 +87,9 @@ docker service logs nextcloud_db
 --tail 100
 
 docker service inspect nextcloud_db
+
+docker network ls
+docker service logs media_pipeline_video-converter
 ```
 
 ### Docker secrets

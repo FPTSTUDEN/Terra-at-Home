@@ -3,87 +3,58 @@
 # ansible-playbook setup.yml -u ubuntu --become
 - name: Include vault variables first
   include_vars: secrets.yml
+  tags: [setup_swarm]
 - name: Setup apps with root
   become: true
   become_user: root
+  tags: [install] # Add tags here
   block:
-  # - name: Docker - Create keyrings directory
-  #   ansible.builtin.file:
-  #     path: /etc/apt/keyrings
-  #     state: directory
-  #     mode: '0755'
-
-  # - name: Docker - Download GPG Key
-  #   ansible.builtin.get_url:
-  #     url: https://download.docker.com/linux/ubuntu/gpg
-  #     dest: /etc/apt/keyrings/docker.asc
-  #     mode: '0644'
-  # - name: Docker - Configure DEB822 Repository
-  #   ansible.builtin.deb822_repository:
-  #     name: docker
-  #     types: [deb]
-  #     uris: ["https://download.docker.com/linux/ubuntu"]
-  #     suites: ["{{ ansible_distribution_release }}"]
-  #     components: [stable]
-  #     signed_by: /etc/apt/keyrings/docker.asc
-  #     state: present
-  # - name: Docker - Install Official Engine and Plugins
-  #   ansible.builtin.apt:
-  #     name:
-  #       - docker-ce
-  #       - docker-ce-cli
-  #       - containerd.io
-  #       - docker-buildx-plugin
-  #       - docker-compose-plugin
-  #       - python3-pip
-  #       - python3-setuptools
-  #       - python3-venv
-  #       - python3-jsondiff
-  #     state: present
-  #     update_cache: yes
-
-  # - name: Docker - Create image directory
-  #   ansible.builtin.file:
-  #     path:  /srv/storage/docker
-  #     state: directory
-  #     mode: '0755'
-  
-  # - name: Media Pipeline - Ensure Storage Folders
-  #   ansible.builtin.file:
-  #     path: "/srv/storage/{{ item }}"
-  #     state: directory
-  #     owner: ubuntu
-  #     group: ubuntu
-  #     mode: '0755'
-  #   loop:
-  #     - video_in
-  #     - video_out
-  #     - scripts
-
-  # - name: Media Pipeline - Copy Compose File
-  #   ansible.builtin.copy:
-  #     src: ../../apps/video_converter/compose.yaml
-  #     dest: /srv/storage/scripts/compose.yaml
-  #     mode: '0644'
-
-  # - name: Media Pipeline - Deploy via Docker Compose
-  #   community.docker.docker_compose_v2:
-  #     project_src: /srv/storage/scripts/
-  #     state: present
-  #     pull: always
-
-  - name: Create data directories
-    file:
-      path: "{{ item }}"
+  - name: Docker - Create keyrings directory
+    ansible.builtin.file:
+      path: /etc/apt/keyrings
       state: directory
-      owner: "33"
-      group: "33"
       mode: '0755'
-    loop:
-      - "{{ data_root }}/postgres"
-      - "{{ data_root }}/redis"
-      - "{{ data_root }}/nextcloud"
-  
+
+  - name: Docker - Download GPG Key
+    ansible.builtin.get_url:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      dest: /etc/apt/keyrings/docker.asc
+      mode: '0644'
+  - name: Docker - Configure DEB822 Repository
+    ansible.builtin.deb822_repository:
+      name: docker
+      types: [deb]
+      uris: ["https://download.docker.com/linux/ubuntu"]
+      suites: ["{{ ansible_distribution_release }}"]
+      components: [stable]
+      signed_by: /etc/apt/keyrings/docker.asc
+      state: present
+  - name: Docker - Install Official Engine and Plugins
+    ansible.builtin.apt:
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+        - python3-pip
+        - python3-setuptools
+        - python3-venv
+        - python3-jsondiff
+      state: present
+      update_cache: yes
+
+  - name: Docker - Create image directory
+    ansible.builtin.file:
+      path:  /srv/storage/docker
+      state: directory
+      mode: '0755'
+
+- name: Setup Swarm with root
+  become: true
+  become_user: root
+  tags: [setup_swarm] # Add tags here
+  block:
   - name: Initialize Docker Swarm
     docker_swarm:
       state: present
@@ -102,6 +73,57 @@
       - { name: "nextcloud_admin_user", value: "{{ nextcloud_admin_user }}" }
       - { name: "nextcloud_admin_password", value: "{{ nextcloud_admin_password }}" }
     no_log: true
+
+- name: Setup media pipeline with root
+  become: true
+  become_user: root
+  tags: [setup_mov] # Add tags here
+  block:
+
+  - name: Media Pipeline - Ensure Storage Folders
+    ansible.builtin.file:
+      path: "/srv/storage/{{ item }}"
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: '0755'
+    loop:
+      - video_in
+      - video_out
+      - scripts
+
+  - name: Media Pipeline - Copy Compose File
+    ansible.builtin.copy:
+      src: ../../apps/video_converter/compose.yaml
+      dest: /srv/storage/scripts/compose.yaml
+      mode: '0644'
+
+  - name: Media Pipeline - Deploy with Secrets
+    community.docker.docker_stack:
+      name: media_pipeline
+      compose:
+        - /srv/storage/scripts/compose.yaml
+      state: present
+  # This ensures secrets exist before the container tries to mount them
+  # depends_on:
+  #   - Create Docker secrets
+
+- name: Setup nextcloud
+  become: true
+  become_user: root
+  tags: [setup_nxc] # Add tags here
+  block:
+  - name: Create data directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "33"
+      group: "33"
+      mode: '0755'
+    loop:
+      - "{{ data_root }}/postgres"
+      - "{{ data_root }}/redis"
+      - "{{ data_root }}/nextcloud"
   
   - name: Create stack directory
     file:
