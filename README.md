@@ -28,15 +28,14 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 ## TO-DO
 
 - [x] video to .MOV auto-converter cause I'm using Iphone... (Watchdog container with FFmpeg /~~Synced local folder -lambda-> .MOV -?-> VM hard disk~~)
-- [x] Nextcloud (in progress)
-- [ ] Ansible tasks that runs only when specified (e.g. --folder-cleanup=true)
 - [ ] What to do with AWS localstack (also, local or VM??)
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Formatting this file to look cooler...
 
+- [ ] Self-hosted YT replacement
 - [ ] Container security
 - [ ] Auto formatting + linting fix for Ansible
-- [ ] Auto fetch container images to avoid runtime errors
+- [ ] ~~Auto fetch container images to avoid runtime errors~~
 
 ## Features
 

@@ -1,28 +1,52 @@
 services:
   video-converter:
-    image: jrottenberg/ffmpeg:8-scratch
-    container_name: vid_processor
+    image: jrottenberg/ffmpeg:8-ubuntu-edge
+    # secrets:
+    #   - nextcloud_admin_user
+    #   - nextcloud_admin_password
+    networks:
+      - nextcloud_nextcloud-net  # Join the same network
+    # container_name: vid_processor
     volumes:
       - /srv/storage:/media:rw
     user: "1000:1000" # Run as 'ubuntu' user to avoid permission issues
     restart: always
-    entrypoint: /bin/sh
+    entrypoint: /bin/bash
     command: >
-      -c "while true; do
-        for f in /media/video_in/*; do
-          [ -f \"$$f\" ] || continue;
+      -c "
+        # apt-get update && apt-get install -y curl;
+        # NC_USER=$$(cat /run/secrets/nextcloud_admin_user);
+        # NC_PASS=$$(cat /run/secrets/nextcloud_admin_password);
+        while true; do
+          for f in /media/video_in/*; do
+            [ -f \"$$f\" ] || continue;
 
-          case \"$$f\" in
-            *.mp4|*.mkv|*.avi|*.mov|*.flv|*.webm) ;;
-            *) continue ;;
-          esac
+            case \"$$f\" in
+              *.mp4|*.mkv|*.avi|*.mov|*.flv|*.webm) ;;
+              *) continue ;;
+            esac
 
-          filename=\"$$(basename \"$$f\")\";
-          name=\"$${filename%.*}\";
-          out=\"/media/video_out/$$name.mov\";
+            filename=\"$$(basename \"$$f\")\";
+            name=\"$${filename%.*}\";
+            out=\"/media/video_out/$$name.mov\";
 
-          echo \"Processing $$f -> $$out\";
-          ffmpeg -i \"$$f\" -c:v libx264 -preset fast -c:a aac \"$$out\" && rm \"$$f\";
-        done;
-        sleep 10;
-      done"
+            echo \"Processing $$f -> $$out\";
+            
+            # Chain FFmpeg and Curl, then cleanup ONLY if both succeed
+            ffmpeg -i \"$$f\" -c:v libx264 -preset fast -c:a aac \"$$out\"
+            # ffmpeg -i \"$$f\" -c:v libx264 -preset fast -c:a aac \"$$out\" && \
+            # curl -u \"$$NC_USER:$$NC_PASS\" -T \"$$out\" \
+            #   \"http://nextcloud:80/remote.php/dav/files/$$NC_USER/Processed/$$(basename \"$$out\")\" && \
+            # rm \"$$f\" \"$$out\";
+            
+          done;
+          sleep 10;
+        done"
+# secrets:
+#   nextcloud_admin_user:
+#     external: true
+#   nextcloud_admin_password:
+#     external: true
+networks:
+  nextcloud_nextcloud-net:
+    external: true  # Tell Compose the network already exists
