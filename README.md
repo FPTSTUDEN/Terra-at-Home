@@ -27,7 +27,6 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 
 ## TO-DO
 
-- [x] video to .MOV auto-converter cause I'm using Iphone... (Watchdog container with FFmpeg /~~Synced local folder -lambda-> .MOV -?-> VM hard disk~~)
 - [ ] What to do with AWS localstack (also, local or VM??)
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Formatting this file to look cooler...
@@ -69,6 +68,7 @@ This project automates a high-performance DevOps environment using Terraform, An
 
 - ```manage.ps1``` as a dashboard to quickly manage infrastructure's lifecycle
 - ```setup.sh``` as an automated cleanup & service configuration script
+- ```scripts/ytdlp.py``` to arrange + download YT content into Nextcloud-synced folder
 
 #### Misc
 

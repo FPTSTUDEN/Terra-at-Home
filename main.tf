@@ -18,7 +18,7 @@ provider "multipass" {
 resource "multipass_instance" "prod-sim" {
   name   = "prod-sim-01"
   # ubuntu 24.04 .4 LTS
-  image = "file://${path.module}/images/noble-server-cloudimg-amd64.img"
+  image = "file://${path.module}/FileServerData/noble-server-cloudimg-amd64.img"
   cpus   = 2
   memory = "3G"
   disk = "10G"
