@@ -28,6 +28,7 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 ## TO-DO
 
 - [ ] What to do with AWS localstack (also, local or VM??)
+- [ ] Interfaces upgrade (Portainer,...)
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Formatting this file to look cooler...
 

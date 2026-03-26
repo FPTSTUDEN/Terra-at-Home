@@ -74,6 +74,36 @@
       - { name: "nextcloud_admin_password", value: "{{ nextcloud_admin_password }}" }
     no_log: true
 
+- name: Setup infra stack
+  become: true
+  become_user: root
+  tags: [setup_infra] # Add tags here
+  block:
+
+  - name: Infra - Ensure Storage Folders
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: '0755'
+    loop:
+      - "/srv/storage/scripts"
+      - "/srv/storage/config/homepage"
+
+  - name: Infra - Copy Compose File
+    ansible.builtin.copy:
+      src: ../../apps/infra-stack.yaml
+      dest: /srv/storage/scripts/infra-stack.yaml
+      mode: '0644'
+
+  - name: infra - Deploy
+    community.docker.docker_stack:
+      name: infra-stack
+      compose:
+        - /srv/storage/scripts/infra-stack.yaml
+      state: present
+
 - name: Setup media pipeline with root
   become: true
   become_user: root
