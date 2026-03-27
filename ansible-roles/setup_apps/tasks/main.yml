@@ -3,11 +3,11 @@
 # ansible-playbook setup.yml -u ubuntu --become
 - name: Include vault variables first
   include_vars: secrets.yml
-  tags: [setup_swarm, setup_nxc]
+  tags: [setup_swarm, setup_nxc, setup_apps]
 - name: Setup apps with root
   become: true
   become_user: root
-  tags: [install] # Add tags here
+  tags: [install, setup_apps] # Add tags here
   block:
   - name: Docker - Create keyrings directory
     ansible.builtin.file:
@@ -53,7 +53,7 @@
 - name: Setup Swarm with root
   become: true
   become_user: root
-  tags: [setup_swarm] # Add tags here
+  tags: [setup_swarm, setup_apps] # Add tags here
   block:
   - name: Initialize Docker Swarm
     docker_swarm:
@@ -77,7 +77,7 @@
 - name: Setup infra stack
   become: true
   become_user: root
-  tags: [setup_infra] # Add tags here
+  tags: [setup_infra, setup_apps] # Add tags here
   block:
 
   - name: Infra - Ensure Storage Folders
@@ -107,7 +107,7 @@
 - name: Setup media pipeline with root
   become: true
   become_user: root
-  tags: [setup_mov] # Add tags here
+  tags: [setup_mov, setup_apps] # Add tags here
   block:
 
   - name: Media Pipeline - Ensure Storage Folders
@@ -138,11 +138,21 @@
   # depends_on:
   #   - Create Docker secrets
 
-- name: Setup nextcloud
+- name: Prepare nextcloud
   become: true
   become_user: root
-  tags: [setup_nxc] # Add tags here
+  tags: [setup_nxc, setup_apps] # Add tags here
   block:
+  - name: Nextcloud - Fix Directory Permissions for VHDX
+    ansible.builtin.file:
+      path: "{{ item }}"
+      owner: "33"
+      group: "33"
+      mode: '0750'
+      recurse: yes
+    loop:
+      - /srv/storage/data/nextcloud/config
+      - /srv/storage/data/nextcloud/data
   - name: Create data directories
     file:
       path: "{{ item }}"
@@ -173,16 +183,44 @@
       dest: /opt/nextcloud/apache-servername.conf
       mode: '0644'
 
-  - name: Remove existing stack if present
-    command: docker stack rm nextcloud
-    register: stack_remove
-    ignore_errors: true
-    changed_when: "'Removing service' in stack_remove.stdout"
-  
-  - name: Wait for stack cleanup
-    pause:
-      seconds: 10
-    when: stack_remove.changed
+- name: Nextcloud - Hard Reset Configuration
+  tags: [reset_nxc,setup_apps]
+  become: true
+  become_user: root
+  block:
+    - name: Scale down Nextcloud to release VHDX locks
+      community.docker.docker_stack:
+        name: nextcloud
+        state: absent
+      # This ensures the containers are gone before we touch the files [cite: 9]
+
+    - name: Force delete config.php using shell
+      # Sometimes the 'file' module is too polite; 'rm -f' is more direct 
+      ansible.builtin.shell: "rm -f /srv/storage/nextcloud/config/config.php"
+      become: true
+
+    - name: Re-enforce UID 33 ownership
+      ansible.builtin.file:
+        path: /srv/storage/nextcloud/config
+        state: directory
+        owner: "33"
+        group: "33"
+        mode: '0750'
+        recurse: yes
+
+- name: Infrastructure - Pre-create Swarm Overlay Network
+  community.docker.docker_network:
+    name: nextcloud-net
+    driver: overlay
+    attachable: true
+    state: present
+  tags: [setup_nxc,setup_apps]
+
+- name: Setup nextcloud
+  become: true
+  become_user: root
+  tags: [setup_nxc, setup_apps] # Add tags here
+  block:
 
   - name: Deploy stack to Swarm
     docker_stack:

@@ -29,11 +29,13 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 
 - [ ] What to do with AWS localstack (also, local or VM??)
 - [ ] Interfaces upgrade (Portainer,...)
+- [ ] map multiple services (like Portainer and Nextcloud) to different paths (e.g., /nextcloud and /portainer) using the same 443 port
 - [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
 - [ ] Formatting this file to look cooler...
 
 - [ ] Self-hosted YT replacement
 - [ ] Container security
+- [ ] Why does setup_nxc task need to be ran twice to succeed...
 - [ ] Auto formatting + linting fix for Ansible
 - [ ] ~~Auto fetch container images to avoid runtime errors~~
 

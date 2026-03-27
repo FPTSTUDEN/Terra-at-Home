@@ -82,6 +82,7 @@ services:
       APACHE_SERVER_ALIAS: localhost {{ ts_ip }}
       PHP_MEMORY_LIMIT: 512M
       PHP_UPLOAD_LIMIT: 512M
+      NEXTCLOUD_INSTALL_CHECK_AND_FINISH: web
     volumes:
       - {{ data_root }}/nextcloud:/var/www/html
       - ./apache-servername.conf:/etc/apache2/conf-enabled/servername.conf:ro
@@ -127,8 +128,7 @@ services:
 
 networks:
   nextcloud-net:
-    driver: overlay
-    attachable: true
+    external: true
 
 secrets:
   postgres_db:

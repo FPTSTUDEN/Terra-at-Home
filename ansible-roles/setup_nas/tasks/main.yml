@@ -3,11 +3,11 @@
 # tasks file for setup_nas
 - name: Include vault variables first
   include_vars: secrets.yml
-  tags: [always]
+  tags: [always, setup_nas]
 
 # --- VHDX SETUP ---
 - name: Setup VHDX Storage
-  tags: [setup_vhdx]
+  tags: [setup_vhdx, setup_nas]
   block:
     - name: Infrastructure - Wait for Persistent VHDX
       ansible.builtin.command: lsblk -f
@@ -30,10 +30,10 @@
     name: [samba, smbclient]
     state: present
     update_cache: yes
-  tags: [install_samba]
+  tags: [install_samba, setup_nas]
 
 - name: Configure Samba
-  tags: [setup_samba]
+  tags: [setup_samba, setup_nas]
   block:
     - name: Configure Samba Share
       ansible.builtin.blockinfile:
@@ -57,10 +57,10 @@
   shell: "curl -fsSL https://tailscale.com/install.sh | sh"
   args:
     creates: /usr/bin/tailscale
-  tags: [install_tailscale]
+  tags: [install_tailscale, setup_nas]
 
 - name: Tailscale API Cleanup and Registration
-  tags: [setup_tailscale]
+  tags: [setup_tailscale, setup_nas]
   block:
     - name: Get Tailscale OAuth2 Token
       ansible.builtin.uri:
@@ -86,14 +86,14 @@
 
     - name: Bring Tailscale Up with Static IP
       command: >
-        tailscale up --authkey='{{ vault_ts_client_secret }}' 
+        tailscale up --auth-key='{{vault_ts_client_secret}}?ephemeral=false&preauthorized=true' 
         --hostname="devops-lab" 
         --accept-routes --advertise-tags=tag:tds --snat-subnet-routes=false
       # Note: Static IPs (100.118.110.61) are usually assigned via the Admin Console 
       # or by using '--advertise-routes' if this node is a subnet router.
       no_log: true
 - name: Setup Tailscale HTTPS Proxy (New Syntax)
-  tags: [setup_tailscale]
+  tags: [setup_tailscale, setup_nas]
   block:
     - name: Configure Tailscale Serve for Nextcloud
       # Simplified syntax: tailscale serve [bg] [target_port]
