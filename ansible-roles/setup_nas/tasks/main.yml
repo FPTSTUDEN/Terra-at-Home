@@ -3,81 +3,92 @@
 # tasks file for setup_nas
 - name: Include vault variables first
   include_vars: secrets.yml
-- name: Infrastructure - Wait for Persistent VHDX
-  ansible.builtin.command: lsblk -f
-  register: disk_output
-  # This loop runs in the background and won't stop other VM processes
-  until: "'lab_data' in disk_output.stdout"
-  retries: 20
-  delay: 5
-  changed_when: false
+  tags: [always]
 
-- name: Infrastructure - Mount Persistent Storage
-  ansible.posix.mount:
-    path: /srv/storage
-    src: LABEL=lab_data
-    fstype: ext4
-    state: mounted
-
-- name: Permissions - Ensure Ubuntu ownership
-  ansible.builtin.file:
-    path: /srv/storage
-    owner: ubuntu
-    group: ubuntu
-    mode: '0755'
-    recurse: yes
-- name: Configure Samba and Tailscale
-  # hosts: web_servers
-  become: true
-  become_user: root
+# --- VHDX SETUP ---
+- name: Setup VHDX Storage
+  tags: [setup_vhdx]
   block:
-    - name: Install Samba
-      apt:
-        name:
-          - samba
-          - smbclient
-        state: present
-        update_cache: yes
-        # cache_valid_time: 0  # Force cache update
+    - name: Infrastructure - Wait for Persistent VHDX
+      ansible.builtin.command: lsblk -f
+      register: disk_output
+      until: "'lab_data' in disk_output.stdout"
+      retries: 20
+      delay: 5
+      changed_when: false
+
+    - name: Infrastructure - Mount Persistent Storage
+      ansible.posix.mount:
+        path: /srv/storage
+        src: LABEL=lab_data
+        fstype: ext4
+        state: mounted
+
+# --- SAMBA INSTALL & SETUP ---
+- name: Install Samba
+  apt:
+    name: [samba, smbclient]
+    state: present
+    update_cache: yes
+  tags: [install_samba]
+
+- name: Configure Samba
+  tags: [setup_samba]
+  block:
     - name: Configure Samba Share
       ansible.builtin.blockinfile:
         path: /etc/samba/smb.conf
-        # create: yes
         block: |
           [DevOpsShare]
-             comment = Persistent Lab Storage
              path = /srv/storage
              read only = no
-             browsable = yes
              guest ok = yes
              force user = ubuntu
-    - name: Verify file content immediately
-      ansible.builtin.shell: "cat /etc/samba/smb.conf | tail -8" 
-      register: smb_content
-    - name: Show the content Ansible sees
-      ansible.builtin.debug:
-        var: smb_content.stdout_lines
-    - name: Create Samba user with password
+
+    - name: Create Samba user
       shell: |
         (echo "{{ vault_samba_password }}"; echo "{{ vault_samba_password }}") | smbpasswd -s -a ubuntu
-      # args:
-      #   creates: /var/lib/samba/private/passdb.tdb
+        smbpasswd -e ubuntu
       no_log: true
-    - name: Enable Samba users
-      shell: smbpasswd -e ubuntu
-    - name: Restart Samba
-      service:
-        name: smbd
-        state: restarted
+      notify: Restart Samba
 
-    - name: Install Tailscale
-      shell: "curl -fsSL https://tailscale.com/install.sh | sh"
-      args:
-        creates: /usr/bin/tailscale
+# --- TAILSCALE INSTALL & CLEANUP ---
+- name: Install Tailscale
+  shell: "curl -fsSL https://tailscale.com/install.sh | sh"
+  args:
+    creates: /usr/bin/tailscale
+  tags: [install_tailscale]
 
-    - name: Bring Tailscale Up using OAuth
+- name: Tailscale API Cleanup and Registration
+  tags: [setup_tailscale]
+  block:
+    - name: Get Tailscale OAuth2 Token
+      ansible.builtin.uri:
+        url: "https://api.tailscale.com/api/v2/oauth/token"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          grant_type: client_credentials
+          client_id: "{{ vault_ts_client_id }}"
+          client_secret: "{{ vault_ts_client_secret }}"
+      register: ts_token
+      no_log: true
+
+    - name: Remove Existing "devops-lab" Devices via API
+      ansible.builtin.shell: |
+        devices=$(curl -s -H "Authorization: Bearer {{ ts_token.json.access_token }}" \
+          "https://api.tailscale.com/api/v2/tailnet/{{ vault_ts_tailnet }}/devices")
+        echo "$devices" | jq -r '.devices[] | select(.name | contains("devops-lab")) | .id' | while read id; do
+          curl -s -X DELETE -H "Authorization: Bearer {{ ts_token.json.access_token }}" \
+            "https://api.tailscale.com/api/v2/device/$id"
+        done
+      changed_when: true
+
+    - name: Bring Tailscale Up with Static IP
       command: >
-        tailscale up --auth-key='{{vault_ts_client_secret}}?ephemeral=false&preauthorized=true' --snat-subnet-routes=false --accept-routes --advertise-tags=tag:tds
-        --hostname="devops-lab"
-      # no_log is CRITICAL so your secret doesn't leak in the terminal output
-      no_log: true
+        tailscale up --authkey='{{ vault_ts_client_secret }}' 
+        --hostname="devops-lab" 
+        --accept-routes --advertise-tags=tag:tds --snat-subnet-routes=false
+      # Note: Static IPs (100.118.110.61) are usually assigned via the Admin Console 
+      # or by using '--advertise-routes' if this node is a subnet router.
+      # no_log: true
