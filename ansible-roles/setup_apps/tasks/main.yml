@@ -3,7 +3,7 @@
 # ansible-playbook setup.yml -u ubuntu --become
 - name: Include vault variables first
   include_vars: secrets.yml
-  tags: [setup_swarm]
+  tags: [setup_swarm, setup_nxc]
 - name: Setup apps with root
   become: true
   become_user: root

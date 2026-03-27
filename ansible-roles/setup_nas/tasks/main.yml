@@ -91,4 +91,23 @@
         --accept-routes --advertise-tags=tag:tds --snat-subnet-routes=false
       # Note: Static IPs (100.118.110.61) are usually assigned via the Admin Console 
       # or by using '--advertise-routes' if this node is a subnet router.
-      # no_log: true
+      no_log: true
+- name: Setup Tailscale HTTPS Proxy (New Syntax)
+  tags: [setup_tailscale]
+  block:
+    - name: Configure Tailscale Serve for Nextcloud
+      # Simplified syntax: tailscale serve [bg] [target_port]
+      # This automatically handles TLS termination and certs
+      ansible.builtin.command: tailscale serve --bg 8121
+      register: ts_serve_output
+      # Check if already serving to avoid 'changed' on every run
+      changed_when: "'8121' not in ts_serve_output.stdout"
+
+    - name: Verify Serve Status
+      ansible.builtin.command: tailscale serve status
+      register: serve_status
+      changed_when: false
+
+    - name: Debug Serve URL
+      ansible.builtin.debug:
+        msg: "Access Nextcloud at: https://devops-lab.{{ vault_ts_tailnet }}"
