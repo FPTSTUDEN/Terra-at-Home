@@ -21,7 +21,7 @@ services:
       mode: global # Runs on every node to collect all logs
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:dev
+    image: ghcr.io/gethomepage/homepage:latest
     ports:
       - "3000:3000"
     volumes:

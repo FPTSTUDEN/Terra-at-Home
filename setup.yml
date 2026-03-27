@@ -3,5 +3,5 @@
   become: true
   roles:
     # - ansible-roles/print_hostname
-    # - ansible-roles/setup_nas
+    - ansible-roles/setup_nas
     - ansible-roles/setup_apps

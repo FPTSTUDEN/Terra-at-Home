@@ -4,13 +4,13 @@ services:
     # secrets:
     #   - nextcloud_admin_user
     #   - nextcloud_admin_password
-    networks:
-      - nextcloud_nextcloud-net  # Join the same network
+    # networks:
+    #   - nextcloud_nextcloud-net  # Join the same network
     # container_name: vid_processor
     volumes:
       - /srv/storage:/media:rw
     user: "1000:1000" # Run as 'ubuntu' user to avoid permission issues
-    restart: always
+    # restart: always
     entrypoint: /bin/bash
     command: >
       -c "
@@ -47,6 +47,6 @@ services:
 #     external: true
 #   nextcloud_admin_password:
 #     external: true
-networks:
-  nextcloud_nextcloud-net:
-    external: true  # Tell Compose the network already exists
+# networks:
+#   nextcloud_nextcloud-net:
+#     external: true  # Tell Compose the network already exists
