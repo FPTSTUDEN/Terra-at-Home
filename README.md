@@ -4,13 +4,15 @@
 ![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
 ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white) -->
 
-# Terra at Home
+# Terra@Home
 
+
+This project automates a high-performance DevOps environment using Terraform, Ansible, and Multipass on a Windows host.
 > <img align="right" alt="earth-chan" src=".misc\earth-chan-with-watering-can-v0-f0616jur8mab1.webp" width=25% height=25%>
 <!-- <div> -->
 > "**Terra**", or **Earth**, is the Third planet of the Solar System, the only one known so far to **harbor life**.
 
-Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Code - shall be the place that **brings life** to my server and my programming journey.
+> Similarly, "**Terra@Home**" - the resemblance of my DevOps environment as Code - shall be the place that **brings life** to my server and my programming journey.
 <!-- </div> -->
 
 **Skills I learned**
@@ -18,30 +20,12 @@ Similarly, "**Terra at Home**" - the resemblance of my DevOps environment as Cod
 ![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-![Wireguard](https://img.shields.io/badge/wireguard-%2388171A.svg?style=for-the-badge&logo=wireguard&logoColor=white)
 ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 
 ![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
-![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
-## TO-DO
-
-- [ ] What to do with AWS localstack (also, local or VM??)
-- [ ] Interfaces upgrade (Portainer,...)
-- [ ] map multiple services (like Portainer and Nextcloud) to different paths (e.g., /nextcloud and /portainer) using the same 443 port
-- [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
-- [ ] Formatting this file to look cooler...
-
-- [ ] Self-hosted YT replacement
-- [ ] Container security
-- [ ] Why does setup_nxc task need to be ran twice to succeed...
-- [ ] Auto formatting + linting fix for Ansible
-- [ ] ~~Auto fetch container images to avoid runtime errors~~
 
 ## Features
-
-This project automates a high-performance DevOps environment using Terraform, Ansible, and Multipass on a Windows host.
 
 ### Architecture
 
@@ -86,6 +70,19 @@ This project automates a high-performance DevOps environment using Terraform, An
 
 Refer to [commands.md](./commands.md)
 
+## TO-DO
+
+- [ ] What to do with AWS localstack (also, local or VM??)
+- [ ] Interfaces upgrade (Portainer,...)
+- [ ] map multiple services (like Portainer and Nextcloud) to different paths (e.g., /nextcloud and /portainer) using the same 443 port
+- [ ] Ansible "Cron Job" inside the VM that automatically backs up important files from the VM's disk into that persistent folder
+- [ ] Formatting this file to look cooler...
+
+- [ ] Self-hosted YT replacement
+- [ ] Container security
+- [ ] Why does setup_nxc task need to be ran twice to succeed...
+- [ ] Auto formatting + linting fix for Ansible
+- [ ] ~~Auto fetch container images to avoid runtime errors~~
 ## Image Credits
 
 - [Cute Earth-chan illustration by k030](https://www.deviantart.com/k030/art/Earth-Chan-731945867)
